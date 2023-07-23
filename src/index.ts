@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 17:45:47
+ * @LastEditTime : 2023-07-23 18:22:27
  * @Description  : 导出树状图
  */
 import {
@@ -12,9 +12,12 @@ import {
 
 import yaml from "json-to-pretty-yaml";
 
+
+import exportDialog from "./dialog";
+
 import "@/index.scss";
 
-import { getBlockByID } from "./api";
+import { getBlockByID, sql } from "./api";
 import { NotebookTree, queryAll_, TreeItem } from "./tree";
 
 export default class ExportTreePlugin extends Plugin {
@@ -27,27 +30,13 @@ export default class ExportTreePlugin extends Plugin {
             icon: "iconFileTree",
             title: "导出树状图",
             callback: async () => {
-                let tree: NotebookTree[] = await queryAll_();
-                console.log('Got')
-                let res = {
-                    documentCount: 0
-                };
-                let notebooksList = [];
-                for (let notebook of tree) {
-                    // res[notebook.notebook.id] = notebook.asJSON();
-                    notebooksList.push(notebook.asJSON());
-                    res.documentCount += notebook.documentCount;
-                }
-                res['notebooks'] = notebooksList;
-                console.log(res);
-                let yml = yaml.stringify(res);
-                //download
-                let blob = new Blob([yml], { type: "text/plain;charset=utf-8" });
-                let url = window.URL.createObjectURL(blob);
-                let a = document.createElement("a");
-                a.href = url;
-                a.download = "tree.yml";
-                a.click();
+                const sqlCode = 'select count(*) as count from blocks where type="d";';
+                let query = await sql(sqlCode);
+                console.log(query[0].count);
+                exportDialog.reset(query[0].count);
+                exportDialog.show(
+                    this.exportTree.bind(this)
+                );
             }
         });
         this.eventBus.on('click-editortitleicon', this.onClickDockIconBindThis);
@@ -62,5 +51,30 @@ export default class ExportTreePlugin extends Plugin {
             await tree_item.queryAll_();
             console.log(tree_item.asJSON());
         }
+    }
+
+    async exportTree() {
+        let tree: NotebookTree[] = await queryAll_();
+        console.log('Got')
+        let res = {
+            documentCount: 0
+        };
+        let notebooksList = [];
+        for (let notebook of tree) {
+            // res[notebook.notebook.id] = notebook.asJSON();
+            notebooksList.push(notebook.asJSON());
+            res.documentCount += notebook.documentCount;
+        }
+        res['notebooks'] = notebooksList;
+        console.log(res);
+        let yml = yaml.stringify(res);
+        //download
+        let blob = new Blob([yml], { type: "text/plain;charset=utf-8" });
+        let url = window.URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = "tree.yml";
+        a.click();
+        exportDialog.hide();
     }
 }

@@ -77,5 +77,6 @@ interface Window {
         storage: any;
         user: any;
         ws: any;
+        languages: any;
     };
 }

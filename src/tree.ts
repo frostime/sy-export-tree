@@ -3,13 +3,12 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 17:45:56
+ * @LastEditTime : 2023-07-23 18:19:12
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, sql, lsNotebooks } from "./api";
 
 import exportDialog from "./dialog";
-
 
 export class TreeItem {
     id: DocumentId;
@@ -140,13 +139,6 @@ export class NotebookTree {
 }
 
 export async function queryAll_(): Promise<NotebookTree[]> {
-    const sqlCode = 'select count(*) as count from blocks where type="d";';
-    let res = await sql(sqlCode);
-    console.log(res[0].count);
-
-    exportDialog.reset(res[0].count);
-    exportDialog.show();
-
     let notebooks = await lsNotebooks();
     let notebookTrees: NotebookTree[] = [];
     for (let notebook of notebooks?.notebooks) {
