@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 15:28:00
+ * @LastEditTime : 2023-07-23 15:56:37
  * @Description  : 导出树状图
  */
 import {
@@ -12,7 +12,7 @@ import {
 import "@/index.scss";
 
 import { getBlockByID } from "./api";
-import { NotebookTree, TreeItem } from "./tree";
+import { queryAll_, TreeItem } from "./tree";
 
 export default class ExportTreePlugin extends Plugin {
 
@@ -23,7 +23,10 @@ export default class ExportTreePlugin extends Plugin {
         this.addTopBar({
             icon: "iconFileTree",
             title: "导出树状图",
-            callback: () => {}
+            callback: async () => {
+                let res = await queryAll_();
+                console.log(res);
+            }
         });
         this.eventBus.on('click-editortitleicon', this.onClickDockIconBindThis);
     }
