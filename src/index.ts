@@ -3,12 +3,15 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 16:13:59
+ * @LastEditTime : 2023-07-23 16:30:50
  * @Description  : 导出树状图
  */
 import {
     Plugin
 } from "siyuan";
+
+import yaml from "json-to-pretty-yaml";
+
 import "@/index.scss";
 
 import { getBlockByID } from "./api";
@@ -31,12 +34,13 @@ export default class ExportTreePlugin extends Plugin {
                     res[notebook.notebook.id] = notebook.asJSON();
                 }
                 console.log(res);
+                let yml = yaml.stringify(res);
                 //download
-                let blob = new Blob([JSON.stringify(res)], { type: "text/plain;charset=utf-8" });
+                let blob = new Blob([yml], { type: "text/plain;charset=utf-8" });
                 let url = window.URL.createObjectURL(blob);
                 let a = document.createElement("a");
                 a.href = url;
-                a.download = "tree.json";
+                a.download = "tree.yaml";
                 a.click();
             }
         });

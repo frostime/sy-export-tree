@@ -3,15 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 16:12:42
- * @Description  : 
- */
-/*
- * Copyright (c) 2023 by frostime. All Rights Reserved.
- * @Author       : frostime
- * @Date         : 2023-07-23 14:38:58
- * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 15:36:50
+ * @LastEditTime : 2023-07-23 16:29:10
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, sql, lsNotebooks } from "./api";
