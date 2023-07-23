@@ -10,6 +10,10 @@ import { ResGetTreeStat, getTreeStat, sql, lsNotebooks } from "./api";
 
 import exportDialog from "./dialog";
 
+const formatTime = (time: string): string => {
+    return time.slice(0, 4) + '-' + time.slice(4, 6) + '-' + time.slice(6, 8) + ' ' + time.slice(8, 10) + ':' + time.slice(10, 12) + ':' + time.slice(12, 14);
+}
+
 export class TreeItem {
     id: DocumentId;
     title: string;
@@ -24,8 +28,8 @@ export class TreeItem {
     constructor(doc: Block) {
         this.id = doc.id;
         this.title = doc.content;
-        this.created = doc.created;
-        this.updated = doc.updated;
+        this.created = formatTime(doc.created);
+        this.updated = formatTime(doc.updated);
         this.stat = null;
         this.childDocs = [];
     }

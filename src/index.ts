@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 18:22:27
+ * @LastEditTime : 2023-07-23 18:41:37
  * @Description  : 导出树状图
  */
 import {
@@ -19,6 +19,14 @@ import "@/index.scss";
 
 import { getBlockByID, sql } from "./api";
 import { NotebookTree, queryAll_, TreeItem } from "./tree";
+
+
+const formatDate = (date: Date): string => {
+    return (
+        date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours()
+        + ':' + date.getMinutes() + ':' + date.getSeconds()
+    );
+}
 
 export default class ExportTreePlugin extends Plugin {
 
@@ -57,7 +65,8 @@ export default class ExportTreePlugin extends Plugin {
         let tree: NotebookTree[] = await queryAll_();
         console.log('Got')
         let res = {
-            documentCount: 0
+            documentCount: 0,
+            exportTime: formatDate(new Date()),
         };
         let notebooksList = [];
         for (let notebook of tree) {
@@ -73,7 +82,12 @@ export default class ExportTreePlugin extends Plugin {
         let url = window.URL.createObjectURL(blob);
         let a = document.createElement("a");
         a.href = url;
-        a.download = "tree.yml";
+
+        let userName = window.siyuan.user.userName;
+        userName = userName ? `@${userName}` : '';
+        let timestamp = formatDate(new Date()).replace(/[:]/g, '_');
+
+        a.download = `SiYuan${userName}-${timestamp}.yml`;
         a.click();
         exportDialog.hide();
     }

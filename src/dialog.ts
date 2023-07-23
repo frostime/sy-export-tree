@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 16:25:46
  * @FilePath     : /src/dialog.ts
- * @LastEditTime : 2023-07-23 18:23:36
+ * @LastEditTime : 2023-07-23 18:48:37
  * @Description  : 
  */
 import { Dialog } from "siyuan";
@@ -29,8 +29,9 @@ class ExportDialog {
 
     show(confirm?: () => void, cancel?: () => void) {
         const html = `
-        <div class="b3-dialog__content" id="export-dialog" style="margin: 1rem; display: flex; flex-direction: column; flex: 1;">
-            <div style="display: flex; margin-bottom: 5px; flex: 1">
+        <div class="b3-dialog__content" style="display: flex; margin-bottom: 5px; flex: 1;" id="confirm-dialog">开始导出?</div>
+        <div class="b3-dialog__content" id="export-dialog" style="margin: 1rem; display: none; flex-direction: column; flex: 1;">
+            <div style="display: flex; margin-bottom: 5px; flex: 1;">
                 <div style="text-align: left" id="infoLabel">导出文档树...</div>
                 <div style="text-align: right; flex: 1" id="progressLabel">${this.value}/${this.max}</div>
             </div>
@@ -42,7 +43,7 @@ class ExportDialog {
         </div>
         `;
         this.dialog = new Dialog({
-            title: "导出树状图",
+            title: "导出所有文档树结构",
             content: html,
             width: '25rem',
             // height: '17rem',
@@ -64,6 +65,10 @@ class ExportDialog {
         });
         btnsElement[1].addEventListener("click", () => {
             if (confirm) {
+                let ele: HTMLDivElement = dialog.element.querySelector('#confirm-dialog');
+                ele.style.display = 'none';
+                ele = dialog.element.querySelector('#export-dialog');
+                ele.style.display = 'flex';
                 confirm();
             }
             // dialog.destroy();
