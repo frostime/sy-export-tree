@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 18:53:59
+ * @LastEditTime : 2023-07-23 19:23:31
  * @Description  : 导出树状图
  */
 import {
@@ -65,7 +65,31 @@ export default class ExportTreePlugin extends Plugin {
         }
         res['notebooks'] = notebooksList;
         console.log(res);
-        let yml = yaml.stringify(res);
+
+        //使用 i18n 替换所有 key, 递归遍历
+        const replaceKey = (obj: any) => {
+            if (Array.isArray(obj)) {
+                let newObj = [];
+                for (let item of obj) {
+                    newObj.push(replaceKey(item));
+                }
+                return newObj;
+            } else if (typeof obj === 'object') {
+                let newObj = {};
+                for (let key in obj) {
+                    let newKey = this.i18n[key];
+                    newKey = newKey ? newKey : key;
+                    newObj[newKey] = replaceKey(obj[key]);
+                }
+                return newObj;
+            } else {
+                return obj;
+            }
+        }
+        let newObj = replaceKey(res);
+        // let newObj = res;
+
+        let yml = yaml.stringify(newObj);
         //download
         let blob = new Blob([yml], { type: "text/plain;charset=utf-8" });
         let url = window.URL.createObjectURL(blob);
