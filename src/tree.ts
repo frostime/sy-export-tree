@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 17:18:48
+ * @LastEditTime : 2023-07-23 17:30:45
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, sql, lsNotebooks } from "./api";
@@ -67,14 +67,29 @@ export class TreeItem {
     }
 
     asJSON(): object {
+        let stat: object = this.stat;
+        for (let key in stat) {
+            if (stat[key] === 0) {
+                //删除
+                stat[key] = undefined;
+            }
+        }
+        let allUndefined = true;
+        for (let key in stat) {
+            if (stat[key] !== undefined) {
+                allUndefined = false;
+                break;
+            }
+        }
+
         let obj = {
             id: this.id,
             title: this.title,
             created: this.created,
             updated: this.updated,
-            childDocsCount: this.childDocsCount,
-            offspringDocsCount: this.offspringDocsCount,
-            stat: this.stat
+            childDocsCount: this.childDocsCount > 0 ? this.childDocsCount : undefined,
+            offspringDocsCount: this.offspringDocsCount > 0 ? this.offspringDocsCount : undefined,
+            stat: allUndefined ? undefined : stat
         };
         if (this.childDocs.length > 0) {
             obj['childDocs'] = this.childDocs.map((item) => item.asJSON());
