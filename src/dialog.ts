@@ -3,10 +3,11 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 16:25:46
  * @FilePath     : /src/dialog.ts
- * @LastEditTime : 2023-07-23 18:48:37
+ * @LastEditTime : 2023-07-23 18:56:25
  * @Description  : 
  */
 import { Dialog } from "siyuan";
+import { i18n } from "./utils";
 
 
 class ExportDialog {
@@ -29,10 +30,10 @@ class ExportDialog {
 
     show(confirm?: () => void, cancel?: () => void) {
         const html = `
-        <div class="b3-dialog__content" style="display: flex; margin-bottom: 5px; flex: 1;" id="confirm-dialog">开始导出?</div>
+        <div class="b3-dialog__content" style="display: flex; margin-bottom: 5px; flex: 1;" id="confirm-dialog">${i18n.startExport}</div>
         <div class="b3-dialog__content" id="export-dialog" style="margin: 1rem; display: none; flex-direction: column; flex: 1;">
             <div style="display: flex; margin-bottom: 5px; flex: 1;">
-                <div style="text-align: left" id="infoLabel">导出文档树...</div>
+                <div style="text-align: left" id="infoLabel">${i18n.exporting}</div>
                 <div style="text-align: right; flex: 1" id="progressLabel">${this.value}/${this.max}</div>
             </div>
             <div style=" flex: 1"> <progress value=${this.value} max=${this.max}>  </progress> </div>
@@ -43,7 +44,7 @@ class ExportDialog {
         </div>
         `;
         this.dialog = new Dialog({
-            title: "导出所有文档树结构",
+            title: i18n.iconTitle,
             content: html,
             width: '25rem',
             // height: '17rem',

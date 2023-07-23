@@ -1,16 +1,5 @@
 {
-    "addTopBarIcon": "Add a top bar icon by plugin",
-    "cancel": "Cancel",
-    "save": "Save",
-    "byeMenu": "Bye, Menu!",
-    "helloPlugin": "Hello, Plugin!",
-    "byePlugin": "Bye, Plugin!",
-    "showDialog": "Show dialog",
-    "removedData": "Data deleted",
-    "confirmRemove": "Confirm to delete the data in ${name}?",
-    "insertEmoji": "Insert Emoji",
-    "name": "SiYuan",
-    "hello": {
-        "makesure": "Before using this template, please read the <a href=\"https://github.com/siyuan-note/plugin-sample\">offical sample</a>, make sure that you've known about the pipeline for plugin developing."
-    }
+    "iconTitle": "导出文档树结构",
+    "startExport": "开始导出?",
+    "exporting": "正在导出文档树..."
 }
