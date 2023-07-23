@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 15:55:58
+ * @LastEditTime : 2023-07-23 16:12:42
  * @Description  : 
  */
 /*
@@ -39,6 +39,7 @@ export class TreeItem {
     async queryAll_() {
         await this.queryStat_();
         await this.queryChildDocs_();
+        DocQueryProgress++;
     }
 
     async queryStat_() {
@@ -59,6 +60,7 @@ export class TreeItem {
         for (let doc of childDocs) {
             let tree_item = new TreeItem(doc);
             this.childDocs.push(tree_item);
+            await tree_item.queryAll_();
         }
     }
 
@@ -80,30 +82,42 @@ export class TreeItem {
  * 一个笔记本 Notebook 下所有的文档树结构
  */
 export class NotebookTree {
-    id: NotebookId;
-    notebook: any;
-    items: TreeItem[];
+    notebook: Notebook;
+    documents: TreeItem[];
 
     constructor(notebook: any) {
-        this.id = notebook.id;
         this.notebook = notebook;
-        this.items = [];
+        this.documents = [];
     }
 
     async queryAll_() {
         // 1. 查看根目录下所有的文档
-        let sqlCode = `select * from blocks where path regexp '/[0-9a-z\-]+\.sy' and type='d' and box = '${this.id}'
+        let sqlCode = `select * from blocks where path regexp '/[0-9a-z\-]+\.sy' and type='d' and box = '${this.notebook.id}'
         order by path;`;
         let rootDocs: Block[] = await sql(sqlCode);
         for (let doc of rootDocs) {
             let tree_item = new TreeItem(doc);
-            this.items.push(tree_item);
+            this.documents.push(tree_item);
+            await tree_item.queryAll_();
         }
-        console.log(this.items);
+        // console.log(this.documents);
+    }
+
+    asJSON(): object {
+        return {
+            notebook: this.notebook,
+            documents: this.documents.map((item) => item.asJSON())
+        };
     }
 }
 
 export async function queryAll_(): Promise<NotebookTree[]> {
+    const sqlCode = 'select count(*) as count from blocks where type="d";';
+    let res = await sql(sqlCode);
+    console.log(res[0].count);
+    DocTotalCount = res[0].count;
+    DocQueryProgress = 0;
+
     let notebooks = await lsNotebooks();
     let notebookTrees: NotebookTree[] = [];
     for (let notebook of notebooks?.notebooks) {
@@ -111,5 +125,13 @@ export async function queryAll_(): Promise<NotebookTree[]> {
         // await notebook_tree.queryAll_();
         notebookTrees.push(notebook_tree);
     }
+    notebookTrees.sort((a, b) => a.notebook.sort - b.notebook.sort);
+
+    for (let notebook_tree of notebookTrees) {
+        await notebook_tree.queryAll_();
+    }
+
+    console.log(DocQueryProgress, DocTotalCount);
+
     return notebookTrees;
 }

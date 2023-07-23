@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 15:56:37
+ * @LastEditTime : 2023-07-23 16:13:59
  * @Description  : 导出树状图
  */
 import {
@@ -12,7 +12,7 @@ import {
 import "@/index.scss";
 
 import { getBlockByID } from "./api";
-import { queryAll_, TreeItem } from "./tree";
+import { NotebookTree, queryAll_, TreeItem } from "./tree";
 
 export default class ExportTreePlugin extends Plugin {
 
@@ -24,8 +24,20 @@ export default class ExportTreePlugin extends Plugin {
             icon: "iconFileTree",
             title: "导出树状图",
             callback: async () => {
-                let res = await queryAll_();
+                let tree: NotebookTree[] = await queryAll_();
+                console.log('Got')
+                let res = {}
+                for (let notebook of tree) {
+                    res[notebook.notebook.id] = notebook.asJSON();
+                }
                 console.log(res);
+                //download
+                let blob = new Blob([JSON.stringify(res)], { type: "text/plain;charset=utf-8" });
+                let url = window.URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "tree.json";
+                a.click();
             }
         });
         this.eventBus.on('click-editortitleicon', this.onClickDockIconBindThis);
