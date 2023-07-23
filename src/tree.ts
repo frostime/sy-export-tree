@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 16:29:10
+ * @LastEditTime : 2023-07-23 16:57:07
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, sql, lsNotebooks } from "./api";
@@ -17,7 +17,10 @@ export class TreeItem {
     created: string;
     updated: string;
     stat?: ResGetTreeStat;
+    childDocsCount: number = 0;
+    offspringDocsCount: number = 0;
     childDocs: TreeItem[];
+
 
     constructor(doc: Block) {
         this.id = doc.id;
@@ -49,10 +52,13 @@ export class TreeItem {
         let sqlCode = `select * from blocks where path regexp '.*/${this.id}/[0-9a-z\-]+\.sy' and type='d'
         order by path;`;
         let childDocs: Block[] = await sql(sqlCode);
+        this.childDocsCount = childDocs.length;
+        this.offspringDocsCount = this.childDocsCount;
         for (let doc of childDocs) {
             let tree_item = new TreeItem(doc);
             this.childDocs.push(tree_item);
             await tree_item.queryAll_();
+            this.offspringDocsCount += tree_item.offspringDocsCount;
         }
     }
 
@@ -60,9 +66,11 @@ export class TreeItem {
         return {
             id: this.id,
             title: this.title,
-            created: this.created,
-            updated: this.updated,
-            stat: this.stat,
+            // created: this.created,
+            // updated: this.updated,
+            childDocsCount: this.childDocsCount,
+            offspringDocsCount: this.offspringDocsCount,
+            // stat: this.stat,
             childDocs: this.childDocs.map((item) => item.asJSON())
         };
     }
@@ -75,6 +83,7 @@ export class TreeItem {
  */
 export class NotebookTree {
     notebook: Notebook;
+    documentCount: number = 0;
     documents: TreeItem[];
 
     constructor(notebook: any) {
@@ -87,19 +96,25 @@ export class NotebookTree {
         let sqlCode = `select * from blocks where path regexp '/[0-9a-z\-]+\.sy' and type='d' and box = '${this.notebook.id}'
         order by path;`;
         let rootDocs: Block[] = await sql(sqlCode);
+        this.documentCount = rootDocs.length;
         for (let doc of rootDocs) {
             let tree_item = new TreeItem(doc);
             this.documents.push(tree_item);
             await tree_item.queryAll_();
+            this.documentCount += tree_item.offspringDocsCount;
         }
         // console.log(this.documents);
     }
 
     asJSON(): object {
-        return {
-            notebook: this.notebook,
-            documents: this.documents.map((item) => item.asJSON())
-        };
+        let obj = {};
+        //merge this.notebook
+        for (let key in this.notebook) {
+            obj[key] = this.notebook[key];
+        }
+        obj['documentCount'] = this.documentCount;
+        obj['documents'] = this.documents.map((item) => item.asJSON());
+        return obj;
     }
 }
 
@@ -113,6 +128,9 @@ export async function queryAll_(): Promise<NotebookTree[]> {
     let notebooks = await lsNotebooks();
     let notebookTrees: NotebookTree[] = [];
     for (let notebook of notebooks?.notebooks) {
+        if (notebook.closed) {
+            continue;
+        }
         let notebook_tree = new NotebookTree(notebook);
         // await notebook_tree.queryAll_();
         notebookTrees.push(notebook_tree);

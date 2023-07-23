@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 16:30:50
+ * @LastEditTime : 2023-07-23 16:37:05
  * @Description  : 导出树状图
  */
 import {
@@ -29,10 +29,16 @@ export default class ExportTreePlugin extends Plugin {
             callback: async () => {
                 let tree: NotebookTree[] = await queryAll_();
                 console.log('Got')
-                let res = {}
+                let res = {
+                    documentCount: 0
+                };
+                let notebooksList = [];
                 for (let notebook of tree) {
-                    res[notebook.notebook.id] = notebook.asJSON();
+                    // res[notebook.notebook.id] = notebook.asJSON();
+                    notebooksList.push(notebook.asJSON());
+                    res['documentsCount'] += notebook.documentCount;
                 }
+                res['notebooks'] = notebooksList;
                 console.log(res);
                 let yml = yaml.stringify(res);
                 //download
