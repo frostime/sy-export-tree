@@ -1,18 +1,18 @@
 {
-  "name": "plugin-sample-vite",
+  "name": "sy-export-tree",
   "author": "frostime",
-  "url": "https://github.com/frostime/plugin-sample-vite",
-  "version": "0.1.10",
+  "url": "https://github.com/frostime/sy-export-tree",
+  "version": "0.1.0",
   "minAppVersion": "2.9.0",
   "backends": ["all"],
   "frontends": ["all"],
   "displayName": {
-    "en_US": "Plugin sample with vite",
-    "zh_CN": "插件样例 vite 版"
+    "en_US": "Export document tree",
+    "zh_CN": "导出文档树结构"
   },
   "description": {
-    "en_US": "SiYuan plugin sample with vite",
-    "zh_CN": "使用 vite 开发的思源插件样例"
+    "en_US": "Export the tree structur of all documents",
+    "zh_CN": "导出笔记库当中所有的文档树结构"
   },
   "readme": {
     "en_US": "README.md",

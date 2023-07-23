@@ -1,9 +1,6 @@
 /**
  * Copyright (c) 2023 frostime. All rights reserved.
  * https://github.com/frostime/sy-plugin-template-vite
- * 
- * See API Document in [API.md](https://github.com/siyuan-note/siyuan/blob/master/API.md)
- * API 文档见 [API_zh_CN.md](https://github.com/siyuan-note/siyuan/blob/master/API_zh_CN.md)
  */
 
 import { fetchSyncPost, IWebSocketData } from "siyuan";
@@ -248,6 +245,21 @@ export async function transferBlockRef(fromID: BlockId, toID: BlockId, refIDs: B
         refIDs: refIDs
     }
     let url = '/api/block/transferBlockRef';
+    return request(url, data);
+}
+
+export type ResGetTreeStat = {
+    imageCount: number;
+    linkCount: number;
+    refCount: number;
+    runeCount: number;
+    wordCount: number;
+}
+export async function getTreeStat(id: BlockId): Promise<ResGetTreeStat> {
+    let data = {
+        id: id
+    }
+    let url = '/api/block/getTreeStat';
     return request(url, data);
 }
 

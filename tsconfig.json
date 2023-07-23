@@ -32,7 +32,7 @@
         "allowJs": true,
         "checkJs": true,
         "types": [
-            "node",
+            // "node",
             "vite/client"
         ],
         // "baseUrl": "./src",
