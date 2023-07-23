@@ -248,6 +248,21 @@ export async function transferBlockRef(fromID: BlockId, toID: BlockId, refIDs: B
     return request(url, data);
 }
 
+export type ResGetTreeStat = {
+    imageCount: number;
+    linkCount: number;
+    refCount: number;
+    runeCount: number;
+    wordCount: number;
+}
+export async function getTreeStat(id: BlockId): Promise<ResGetTreeStat> {
+    let data = {
+        id: id
+    }
+    let url = '/api/block/getTreeStat';
+    return request(url, data);
+}
+
 // **************************************** Attributes ****************************************
 export async function setBlockAttrs(id: BlockId, attrs: { [key: string]: string }) {
     let data = {
