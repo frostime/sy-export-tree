@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 16:37:05
+ * @LastEditTime : 2023-07-23 17:16:45
  * @Description  : 导出树状图
  */
 import {
@@ -36,17 +36,18 @@ export default class ExportTreePlugin extends Plugin {
                 for (let notebook of tree) {
                     // res[notebook.notebook.id] = notebook.asJSON();
                     notebooksList.push(notebook.asJSON());
-                    res['documentsCount'] += notebook.documentCount;
+                    res.documentCount += notebook.documentCount;
                 }
                 res['notebooks'] = notebooksList;
                 console.log(res);
-                let yml = yaml.stringify(res);
+                // let yml = yaml.stringify(res);
+                let json = JSON.stringify(res);
                 //download
-                let blob = new Blob([yml], { type: "text/plain;charset=utf-8" });
+                let blob = new Blob([json], { type: "text/plain;charset=utf-8" });
                 let url = window.URL.createObjectURL(blob);
                 let a = document.createElement("a");
                 a.href = url;
-                a.download = "tree.yaml";
+                a.download = "tree.json";
                 a.click();
             }
         });
