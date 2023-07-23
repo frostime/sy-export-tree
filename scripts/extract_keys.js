@@ -27,7 +27,7 @@ function writeKeys(keys)
     fs.writeFileSync('keys.json', json);
 }
 
-let keys = getKeys('C:/Users/EEG/Desktop/SiYuan@Frostime-2023-7-23 18_49_10.yml');
+let keys = getKeys('C:/Users/EEG/Desktop/SiYuan@Frostime.yml');
 keys = getUniqueKeys(keys);
 writeKeys(keys);
 

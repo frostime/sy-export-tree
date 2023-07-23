@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-23 18:19:12
+ * @LastEditTime : 2023-07-23 19:37:05
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, sql, lsNotebooks } from "./api";
@@ -14,9 +14,21 @@ const formatTime = (time: string): string => {
     return time.slice(0, 4) + '-' + time.slice(4, 6) + '-' + time.slice(6, 8) + ' ' + time.slice(8, 10) + ':' + time.slice(10, 12) + ':' + time.slice(12, 14);
 }
 
+const renameKey = (obj: object, keyMap: {[key: string]: string}) => {
+    let newObj = {};
+    for (let key in obj) {
+        if (keyMap[key]) {
+            newObj[keyMap[key]] = obj[key];
+        } else {
+            newObj[key] = obj[key];
+        }
+    }
+    return newObj;
+}
+
 export class TreeItem {
-    id: DocumentId;
-    title: string;
+    docId: DocumentId;
+    docTitle: string;
     created: string;
     updated: string;
     stat?: ResGetTreeStat;
@@ -26,8 +38,8 @@ export class TreeItem {
 
 
     constructor(doc: Block) {
-        this.id = doc.id;
-        this.title = doc.content;
+        this.docId = doc.id;
+        this.docTitle = doc.content;
         this.created = formatTime(doc.created);
         this.updated = formatTime(doc.updated);
         this.stat = null;
@@ -45,18 +57,18 @@ export class TreeItem {
     }
 
     async queryStat_() {
-        if (!this.id || this.stat !== null) {
+        if (!this.docId || this.stat !== null) {
             return;
         }
-        this.stat = await getTreeStat(this.id);
+        this.stat = await getTreeStat(this.docId);
     }
 
     async queryChildDocs_() {
-        if (!this.id || this.childDocs.length > 0) {
+        if (!this.docId || this.childDocs.length > 0) {
             return;
         }
 
-        let sqlCode = `select * from blocks where path regexp '.*/${this.id}/[0-9a-z\-]+\.sy' and type='d'
+        let sqlCode = `select * from blocks where path regexp '.*/${this.docId}/[0-9a-z\-]+\.sy' and type='d'
         order by path;`;
         let childDocs: Block[] = await sql(sqlCode);
         this.childDocsCount = childDocs.length;
@@ -86,8 +98,8 @@ export class TreeItem {
         }
 
         let obj = {
-            id: this.id,
-            title: this.title,
+            docId: this.docId,
+            docTitle: this.docTitle,
             created: this.created,
             updated: this.updated,
             childDocsCount: this.childDocsCount > 0 ? this.childDocsCount : undefined,
@@ -133,8 +145,16 @@ export class NotebookTree {
     asJSON(): object {
         let obj = {};
         //merge this.notebook
-        for (let key in this.notebook) {
-            obj[key] = this.notebook[key];
+        let notebook = renameKey(this.notebook, {
+            'id': 'notebookId',
+            'name': 'notebookName',
+            'closed': 'notebookClosed'
+        });
+        delete notebook['icon'];
+        delete notebook['sort'];
+        delete notebook['sortMode'];
+        for (let key in notebook) {
+            obj[key] = notebook[key];
         }
         obj['documentCount'] = this.documentCount;
         obj['documents'] = this.documents.map((item) => item.asJSON());
