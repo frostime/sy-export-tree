@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 16:25:46
  * @FilePath     : /src/dialog.ts
- * @LastEditTime : 2023-07-24 14:44:20
+ * @LastEditTime : 2023-07-24 14:57:17
  * @Description  : 
  */
 import { confirm } from "siyuan";
@@ -46,7 +46,8 @@ class ExportDialog {
     }
 
     doExport() {
-        confirm(i18n.iconTitle, i18n.startExport, () => {
+        let txt = i18n.totalCount.replace("${}", this.max.toString());
+        confirm(i18n.iconTitle, `${txt}, ${i18n.startExport}`, () => {
             this.statusBarItem.style.display = 'flex';
             this.plugin.exportTree();
         });

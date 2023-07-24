@@ -1,5 +1,6 @@
 {
     "iconTitle": "Export Document Tree Structure",
+    "totalCount": "Total documents ${}",
     "startExport": "Start Exporting?",
     "exporting": "Exporting...",
 
