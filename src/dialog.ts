@@ -3,82 +3,57 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 16:25:46
  * @FilePath     : /src/dialog.ts
- * @LastEditTime : 2023-07-23 18:56:25
+ * @LastEditTime : 2023-07-24 14:44:20
  * @Description  : 
  */
-import { Dialog } from "siyuan";
+import { confirm } from "siyuan";
 import { i18n } from "./utils";
+import type ExportTreePlugin from "./index";
 
 
 class ExportDialog {
-    ilabel: HTMLDivElement;
+    statusBarItem: HTMLDivElement;
     plabel: HTMLDivElement;
     progress: HTMLProgressElement;
 
-    max: number = 0;
+    max: number = 100;
     value: number = 0;
 
-    dialog: Dialog;
+    plugin: ExportTreePlugin;
+
+    constructor() {
+        const html = `
+        <div id="export-tree" style="display: flex;">
+        <label style="">${i18n.exporting}</label>
+            <div style="width: 100px;">
+                <progress value=${this.value} max=${this.max}>  </progress>
+            </div>
+            <label style="" id="progressLabel">${this.value}/${this.max}</label>
+        </div>
+        `;
+        this.statusBarItem = document.createElement('div');
+        this.statusBarItem.innerHTML = html;
+        this.plabel = this.statusBarItem.querySelector('#progressLabel');
+        this.progress = this.statusBarItem.querySelector('progress');
+        this.progress.style.width = '100%';
+        this.hide();
+    }
 
     reset(max: number = 0) {
         this.max = max;
         this.value = 0;
         // this.update();
-        this.progress = null;
-        this.dialog = null;
     }
 
-    show(confirm?: () => void, cancel?: () => void) {
-        const html = `
-        <div class="b3-dialog__content" style="display: flex; margin-bottom: 5px; flex: 1;" id="confirm-dialog">${i18n.startExport}</div>
-        <div class="b3-dialog__content" id="export-dialog" style="margin: 1rem; display: none; flex-direction: column; flex: 1;">
-            <div style="display: flex; margin-bottom: 5px; flex: 1;">
-                <div style="text-align: left" id="infoLabel">${i18n.exporting}</div>
-                <div style="text-align: right; flex: 1" id="progressLabel">${this.value}/${this.max}</div>
-            </div>
-            <div style=" flex: 1"> <progress value=${this.value} max=${this.max}>  </progress> </div>
-        </div>
-        <div class="b3-dialog__action">
-            <button class="b3-button b3-button--cancel">${window.siyuan.languages.cancel}</button><div class="fn__space"></div>
-            <button class="b3-button b3-button--text" id="confirmDialogConfirmBtn">${window.siyuan.languages.confirm}</button>
-        </div>
-        `;
-        this.dialog = new Dialog({
-            title: i18n.iconTitle,
-            content: html,
-            width: '25rem',
-            // height: '17rem',
-        });
-        let dialog = this.dialog;
-        this.ilabel = dialog.element.querySelector('#infoLabel');
-        this.plabel = dialog.element.querySelector('#progressLabel');
-        this.progress = dialog.element.querySelector('progress');
-        this.progress.style.width = '100%';
-        // this.progress.style.color = 'var(--b3-theme-primary)';
-        //background color
-        // this.progress.style.background = 'var(--b3-theme-primary)';
-        const btnsElement = dialog.element.querySelectorAll(".b3-button");
-        btnsElement[0].addEventListener("click", () => {
-            if (cancel) {
-                cancel();
-            }
-            dialog.destroy();
-        });
-        btnsElement[1].addEventListener("click", () => {
-            if (confirm) {
-                let ele: HTMLDivElement = dialog.element.querySelector('#confirm-dialog');
-                ele.style.display = 'none';
-                ele = dialog.element.querySelector('#export-dialog');
-                ele.style.display = 'flex';
-                confirm();
-            }
-            // dialog.destroy();
+    doExport() {
+        confirm(i18n.iconTitle, i18n.startExport, () => {
+            this.statusBarItem.style.display = 'flex';
+            this.plugin.exportTree();
         });
     }
 
     hide() {
-        this.dialog.destroy();
-        this.reset();
+        this.statusBarItem.style.display = 'none';
     }
 
     increase() {
@@ -93,5 +68,12 @@ class ExportDialog {
     }
 }
 
-let dialog = new ExportDialog();
+let dialog: ExportDialog;
+
+function initDialog(plugin: ExportTreePlugin) {
+    dialog = new ExportDialog();
+    dialog.plugin = plugin;
+}
+
 export default dialog;
+export { initDialog };

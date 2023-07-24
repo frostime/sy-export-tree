@@ -1,7 +1,7 @@
 {
     "iconTitle": "Export Document Tree Structure",
     "startExport": "Start Exporting?",
-    "exporting": "Exporting Document Tree...",
+    "exporting": "Exporting...",
 
     "childDocs": "Child Documents",
     "childDocsCount": "Number of Child Documents",

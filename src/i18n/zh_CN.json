@@ -1,7 +1,7 @@
 {
     "iconTitle": "导出文档树结构",
     "startExport": "开始导出?",
-    "exporting": "正在导出文档树...",
+    "exporting": "导出中...",
 
     "childDocs": "子文档",
     "childDocsCount": "子文档数量",
