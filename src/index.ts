@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-23 19:44:23
+ * @LastEditTime : 2023-07-24 14:26:05
  * @Description  : 导出树状图
  */
 import {
@@ -14,6 +14,7 @@ import yaml from "json-to-pretty-yaml";
 
 
 import exportDialog from "./dialog";
+import { initDialog } from "./dialog";
 
 import "@/index.scss";
 
@@ -33,6 +34,8 @@ export default class ExportTreePlugin extends Plugin {
 
     onload() {
         this.addIcons(`<symbol id="iconFileTree" viewBox="0 0 1152 1024" ><path d="M128 64C128 28.6 99.4 0 64 0S0 28.6 0 64v704c0 70.6 57.4 128 128 128h384v-128H128V320h384V192H128V64z m448 320c0 35.4 28.6 64 64 64h448c35.4 0 64-28.6 64-64V128c0-35.4-28.6-64-64-64h-197.4c-17 0-33.2-6.8-45.2-18.8L818.8 18.8c-12-12-28.2-18.8-45.2-18.8H640c-35.4 0-64 28.6-64 64v320z m0 576c0 35.4 28.6 64 64 64h448c35.4 0 64-28.6 64-64V704c0-35.4-28.6-64-64-64h-197.4c-17 0-33.2-6.8-45.2-18.8l-26.6-26.6c-12-12-28.2-18.8-45.2-18.8H640c-35.4 0-64 28.6-64 64V960z" p-id="4360"></path></symbol>`);
+        setI18n(this.i18n);
+        initDialog(this);
         this.addTopBar({
             icon: "iconFileTree",
             title: this.i18n.iconTitle,
@@ -41,12 +44,13 @@ export default class ExportTreePlugin extends Plugin {
                 let query = await sql(sqlCode);
                 console.log(query[0].count);
                 exportDialog.reset(query[0].count);
-                exportDialog.show(
-                    this.exportTree.bind(this)
-                );
+                exportDialog.doExport();
             }
         });
-        setI18n(this.i18n);
+        this.addStatusBar({
+            element: exportDialog.statusBarItem,
+            position: 'right'
+        });
     }
 
 
