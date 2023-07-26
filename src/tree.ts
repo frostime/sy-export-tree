@@ -3,10 +3,10 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-26 14:32:35
+ * @LastEditTime : 2023-07-26 14:37:58
  * @Description  : 导出的文档树的相关数据结构
  */
-import { ResGetTreeStat, getTreeStat, sql, lsNotebooks, readDir } from "./api";
+import { ResGetTreeStat, getTreeStat, sql, lsNotebooks, readDir, getBlockByID } from "./api";
 
 import exportDialog from "./dialog";
 
@@ -123,11 +123,20 @@ export class TreeItem {
         allItems.push(...this.childDocs); // 遍历所有的子节点
         let retrieve = await Promise.all(dirItems.map((item) => item.buildTree()));
         allItems.push(...retrieve.flat()); // 遍历所有的子节点的子节点
+        this.childDocsCount = this.childDocs.length;
+        this.offspringDocsCount = allItems.length;
         // for (let item of dirItems) {
         //     let retrieve = await item.buildTree(`${currentPath}/${item.docId}`);
         //     allItems.push(...retrieve);
         // }
         return allItems;
+    }
+
+    async queryItemInfo() {
+        let block = await getBlockByID(this.docId);
+        this.docTitle = block.content;
+        this.created = formatTime(block.created);
+        this.updated = formatTime(block.updated);
     }
 
     asJSON(): object {
