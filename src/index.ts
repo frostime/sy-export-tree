@@ -55,7 +55,12 @@ export default class ExportTreePlugin extends Plugin {
 
 
     async exportTree() {
+        let start = new Date().getTime();
+        let end = start;
         let tree: NotebookTree[] = await queryAll_();
+        end = new Date().getTime();
+        console.log(`Retireving tree cost: ${(end - start) / 1000}s`);
+
         console.log('Got')
         let res = {
             documentCount: 0,
@@ -105,7 +110,7 @@ export default class ExportTreePlugin extends Plugin {
         let timestamp = formatDate(new Date()).replace(/[:]/g, '_');
 
         a.download = `SiYuan${userName}-${timestamp}.yml`;
-        a.click();
+        // a.click(); //#TODO 重新开启
         exportDialog.hide();
     }
 }
