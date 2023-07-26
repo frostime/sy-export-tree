@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-26 15:07:08
+ * @LastEditTime : 2023-07-26 15:09:35
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID } from "./api";
@@ -56,46 +56,6 @@ export class TreeItem {
         this.childDocs = [];
         this.path = `${docDir}/${this.docId}`;
     }
-
-    // async queryAll_() {
-    //     // await this.queryStat_();
-    //     // await this.queryChildDocs_();
-    //     await Promise.all([this.queryStat_(), this.queryChildDocs_()]);
-    //     exportDialog.increase();
-    //     // for (let childDoc of this.childDocs) {
-    //     //     await childDoc.queryAll_();
-    //     //     this.offspringDocsCount += childDoc.offspringDocsCount;
-    //     // }
-    //     await Promise.all(this.childDocs.map((item) => item.queryAll_()));
-    //     this.childDocs.forEach((item) => {
-    //         this.offspringDocsCount += item.offspringDocsCount;
-    //     });
-    // }
-
-    // async queryStat_() {
-    //     if (!this.docId || this.stat !== null) {
-    //         return;
-    //     }
-    //     this.stat = await getTreeStat(this.docId);
-    // }
-
-    // async queryChildDocs_() {
-    //     if (!this.docId || this.childDocs.length > 0) {
-    //         return;
-    //     }
-
-    //     let sqlCode = `select * from blocks where path regexp '.*/${this.docId}/[0-9a-z\-]+\.sy' and type='d'
-    //     order by path;`;
-    //     let childDocs: Block[] = await sql(sqlCode);
-    //     this.childDocsCount = childDocs.length;
-    //     this.offspringDocsCount = this.childDocsCount;
-    //     for (let doc of childDocs) {
-    //         let tree_item = new TreeItem(doc);
-    //         this.childDocs.push(tree_item);
-    //         // await tree_item.queryAll_();
-    //         // this.offspringDocsCount += tree_item.offspringDocsCount;
-    //     }
-    // }
 
     /**
      * 递归地构建树结构
@@ -190,25 +150,7 @@ export class NotebookTree {
         this.documents = [];
     }
 
-    // async queryAll_() {
-    //     // 1. 查看根目录下所有的文档
-    //     let sqlCode = `select * from blocks where path regexp '^/[0-9a-z\-]+\.sy$' and type='d' and box = '${this.notebook.id}' order by path;`;
-    //     let rootDocs: Block[] = await sql(sqlCode);
-    //     this.documentCount = rootDocs.length;
-    //     // for (let doc of rootDocs) {
-    //     //     let tree_item = new TreeItem(doc);
-    //     //     this.documents.push(tree_item);
-    //     //     await tree_item.queryAll_();
-    //     //     this.documentCount += tree_item.offspringDocsCount;
-    //     // }
-    //     this.documents = rootDocs.map((item) => new TreeItem(item));
-    //     await Promise.all(this.documents.map((item) => item.queryAll_()));
-    //     this.documents.forEach((item) => {
-    //         this.documentCount += item.offspringDocsCount;
-    //     });
-    // }
-
-    async buildTree() {
+    async build() {
         let childPath = await readDocPath(`/data/${this.notebook.id}`);
         let childInfo = {};
         for (let child of childPath) {
@@ -263,7 +205,7 @@ export class NotebookTree {
     }
 }
 
-export async function queryAll_(): Promise<NotebookTree[]> {
+export async function queryAll(): Promise<NotebookTree[]> {
     let notebooks = await lsNotebooks();
     let notebookTrees: NotebookTree[] = [];
     for (let notebook of notebooks?.notebooks) {
@@ -280,7 +222,7 @@ export async function queryAll_(): Promise<NotebookTree[]> {
     //     await notebook_tree.queryAll_();
     // }
     // await Promise.all(notebookTrees.map((item) => item.queryAll_()));
-    await Promise.all(notebookTrees.map((item) => item.buildTree()));
+    await Promise.all(notebookTrees.map((item) => item.build()));
 
     return notebookTrees;
 }

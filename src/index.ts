@@ -19,7 +19,7 @@ import { initDialog } from "./dialog";
 import "@/index.scss";
 
 import { sql } from "./api";
-import { NotebookTree, queryAll_ } from "./tree";
+import { NotebookTree, queryAll } from "./tree";
 import { setI18n } from "./utils";
 
 
@@ -57,7 +57,7 @@ export default class ExportTreePlugin extends Plugin {
     async exportTree() {
         let start = new Date().getTime();
         let end = start;
-        let tree: NotebookTree[] = await queryAll_();
+        let tree: NotebookTree[] = await queryAll();
         end = new Date().getTime();
         console.log(`Retireving tree cost: ${(end - start) / 1000}s`);
 
