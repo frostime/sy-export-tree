@@ -2,7 +2,7 @@
 
 Export the structure of your current note document tree as a yaml formatted text file.
 
-> Note: When the number of notes is large, the export process may take a long time. Once the export task is started, it cannot be stopped. It is best to choose a time when you are free to perform the export task.
+> Note: Once the export task is turned on, it cannot be closed, and the use of notes during the export period will be significantly stuck, it is best to choose a free time to perform the export task.
 
 The basic structure of the exported yaml is as follows:
 
