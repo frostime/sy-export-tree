@@ -62,14 +62,26 @@ export default class ExportTreePlugin extends Plugin {
         console.log(`Retireving tree cost: ${(end - start) / 1000}s`);
 
         let res = {
-            documentCount: 0,
             exportTime: formatDate(new Date()),
+            documentCount: 0,
+            stat: {
+                imageCount: 0,
+                linkCount: 0,
+                refCount: 0,
+                runeCount: 0,
+                wordCount: 0
+            }
         };
         let notebooksList = [];
         for (let notebook of tree) {
             // res[notebook.notebook.id] = notebook.asJSON();
             notebooksList.push(notebook.asJSON());
             res.documentCount += notebook.documentCount;
+            res.stat.imageCount += notebook.stat.imageCount;
+            res.stat.linkCount += notebook.stat.linkCount;
+            res.stat.refCount += notebook.stat.refCount;
+            res.stat.runeCount += notebook.stat.runeCount;
+            res.stat.wordCount += notebook.stat.wordCount;
         }
         res['notebooks'] = notebooksList;
         console.log(res);
