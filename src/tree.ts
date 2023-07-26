@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-26 17:10:48
+ * @LastEditTime : 2023-07-26 17:13:33
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID } from "./api";
@@ -215,8 +215,8 @@ export class NotebookTree {
             obj[key] = notebook[key];
         }
         obj['documentCount'] = this.documentCount;
-        obj['documents'] = this.documents.map((item) => item.asJSON());
         obj['stat'] = this.stat;
+        obj['documents'] = this.documents.map((item) => item.asJSON());
         return obj;
     }
 }

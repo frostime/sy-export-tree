@@ -9,8 +9,14 @@ The basic structure of the exported yaml is as follows:
 1. Topmost
 
     ```yaml
-    Number of Documents: 60
-    Export Time: "2023-7-24 13:17:1"
+    Export Time: "2023-7-26 17:14:58"
+    Number of Documents: 903
+    Document Information:
+      Images: 1004
+      Number of Links: 3454
+      Reference Count: 735
+      Character Count: 925420
+      Word Count: 420142
     Notebooks:
       - Notebook ID: "20210808180117-czj9bvb"
         Notebook Name: "Notebook A"
