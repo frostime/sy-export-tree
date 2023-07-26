@@ -3,10 +3,10 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-26 14:37:58
+ * @LastEditTime : 2023-07-26 15:07:08
  * @Description  : 导出的文档树的相关数据结构
  */
-import { ResGetTreeStat, getTreeStat, sql, lsNotebooks, readDir, getBlockByID } from "./api";
+import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID } from "./api";
 
 import exportDialog from "./dialog";
 
@@ -119,11 +119,13 @@ export class TreeItem {
                 dirItems.push(tree_item);
             }
         }
+        this.childDocsCount = this.childDocs.length;
+        exportDialog.increase(this.childDocsCount);
+
         let allItems: TreeItem[] = [];
         allItems.push(...this.childDocs); // 遍历所有的子节点
         let retrieve = await Promise.all(dirItems.map((item) => item.buildTree()));
         allItems.push(...retrieve.flat()); // 遍历所有的子节点的子节点
-        this.childDocsCount = this.childDocs.length;
         this.offspringDocsCount = allItems.length;
         // for (let item of dirItems) {
         //     let retrieve = await item.buildTree(`${currentPath}/${item.docId}`);
@@ -137,6 +139,8 @@ export class TreeItem {
         this.docTitle = block.content;
         this.created = formatTime(block.created);
         this.updated = formatTime(block.updated);
+        this.stat = await getTreeStat(this.docId);
+        exportDialog.increase();
     }
 
     asJSON(): object {
@@ -226,20 +230,17 @@ export class NotebookTree {
         let retrieve = await Promise.all(
             dirItems.map((item) => item.buildTree())
         );
+        exportDialog.increase(dirItems.length);
         allItems.push(...retrieve.flat());
+        this.documentCount = allItems.length;
         // for (let item of dirItems) {
         //     let retrieve = await item.buildTree(`/data/${this.notebook.id}/${item.docId}`);
         //     allItems.push(...retrieve);
         // }
-        console.log(this.notebook.name, allItems);
-        //check duplicate
-        let allItemsMap = {};
-        for (let item of allItems) {
-            if (allItemsMap[item.docId]) {
-                console.error('duplicate', item.docId);
-            }
-            allItemsMap[item.docId] = true;
-        }
+
+        await Promise.all(
+            allItems.map((item) => item.queryItemInfo())
+        );
     }
 
     asJSON(): object {
@@ -280,7 +281,6 @@ export async function queryAll_(): Promise<NotebookTree[]> {
     // }
     // await Promise.all(notebookTrees.map((item) => item.queryAll_()));
     await Promise.all(notebookTrees.map((item) => item.buildTree()));
-    // await notebookTrees[0].buildTree(); //TODO 测试完成后换回来
 
     return notebookTrees;
 }

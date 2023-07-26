@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 16:25:46
  * @FilePath     : /src/dialog.ts
- * @LastEditTime : 2023-07-24 14:57:17
+ * @LastEditTime : 2023-07-26 15:05:04
  * @Description  : 
  */
 import { confirm } from "siyuan";
@@ -16,6 +16,7 @@ class ExportDialog {
     plabel: HTMLDivElement;
     progress: HTMLProgressElement;
 
+    docCnt: number = 0;
     max: number = 100;
     value: number = 0;
 
@@ -39,14 +40,15 @@ class ExportDialog {
         this.hide();
     }
 
-    reset(max: number = 0) {
-        this.max = max;
+    reset(docCnt: number = 0) {
+        this.docCnt = docCnt;
+        this.max = docCnt * 2; // 首先需要获取所有的文档，然后再获取所有的块
         this.value = 0;
         // this.update();
     }
 
     doExport() {
-        let txt = i18n.totalCount.replace("${}", this.max.toString());
+        let txt = i18n.totalCount.replace("${}", this.docCnt.toString());
         confirm(i18n.iconTitle, `${txt}, ${i18n.startExport}`, () => {
             this.statusBarItem.style.display = 'flex';
             this.plugin.exportTree();
@@ -57,8 +59,8 @@ class ExportDialog {
         this.statusBarItem.style.display = 'none';
     }
 
-    increase() {
-        this.value++;
+    increase(inc: number = 1) {
+        this.value += inc;
         this.update();
     }
 

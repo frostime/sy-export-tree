@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-24 14:26:05
+ * @LastEditTime : 2023-07-26 15:03:37
  * @Description  : 导出树状图
  */
 import {
@@ -61,7 +61,6 @@ export default class ExportTreePlugin extends Plugin {
         end = new Date().getTime();
         console.log(`Retireving tree cost: ${(end - start) / 1000}s`);
 
-        console.log('Got')
         let res = {
             documentCount: 0,
             exportTime: formatDate(new Date()),
@@ -110,7 +109,7 @@ export default class ExportTreePlugin extends Plugin {
         let timestamp = formatDate(new Date()).replace(/[:]/g, '_');
 
         a.download = `SiYuan${userName}-${timestamp}.yml`;
-        // a.click(); //#TODO 重新开启
+        a.click();
         exportDialog.hide();
     }
 }
