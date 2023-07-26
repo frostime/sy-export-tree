@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-24 14:26:05
+ * @LastEditTime : 2023-07-26 15:03:37
  * @Description  : 导出树状图
  */
 import {
@@ -19,7 +19,7 @@ import { initDialog } from "./dialog";
 import "@/index.scss";
 
 import { sql } from "./api";
-import { NotebookTree, queryAll_ } from "./tree";
+import { NotebookTree, queryAll } from "./tree";
 import { setI18n } from "./utils";
 
 
@@ -55,8 +55,12 @@ export default class ExportTreePlugin extends Plugin {
 
 
     async exportTree() {
-        let tree: NotebookTree[] = await queryAll_();
-        console.log('Got')
+        let start = new Date().getTime();
+        let end = start;
+        let tree: NotebookTree[] = await queryAll();
+        end = new Date().getTime();
+        console.log(`Retireving tree cost: ${(end - start) / 1000}s`);
+
         let res = {
             documentCount: 0,
             exportTime: formatDate(new Date()),
