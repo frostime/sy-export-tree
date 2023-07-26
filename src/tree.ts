@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-26 15:09:35
+ * @LastEditTime : 2023-07-26 17:10:48
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID } from "./api";
@@ -145,6 +145,8 @@ export class NotebookTree {
     documentCount: number = 0;
     documents: TreeItem[];
 
+    stat: ResGetTreeStat;
+
     constructor(notebook: any) {
         this.notebook = notebook;
         this.documents = [];
@@ -183,6 +185,19 @@ export class NotebookTree {
         await Promise.all(
             allItems.map((item) => item.queryItemInfo())
         );
+
+        this.stat = {
+            imageCount: 0,
+            linkCount: 0,
+            refCount: 0,
+            runeCount: 0,
+            wordCount: 0
+        }
+        allItems.forEach((item) => {
+            for (let key in this.stat) {
+                this.stat[key] += item.stat[key];
+            }
+        });
     }
 
     asJSON(): object {
@@ -201,6 +216,7 @@ export class NotebookTree {
         }
         obj['documentCount'] = this.documentCount;
         obj['documents'] = this.documents.map((item) => item.asJSON());
+        obj['stat'] = this.stat;
         return obj;
     }
 }
