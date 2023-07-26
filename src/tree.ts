@@ -190,10 +190,10 @@ export class NotebookTree {
         //merge this.notebook
         let notebook = renameKey(this.notebook, {
             'id': 'notebookId',
-            'name': 'notebookName',
-            'closed': 'notebookClosed'
+            'name': 'notebookName'
         });
         delete notebook['icon'];
+        delete notebook['closed'];
         delete notebook['sort'];
         delete notebook['sortMode'];
         for (let key in notebook) {

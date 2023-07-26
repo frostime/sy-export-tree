@@ -14,7 +14,6 @@ The basic structure of the exported yaml is as follows:
     Notebooks:
       - Notebook ID: "20210808180117-czj9bvb"
         Notebook Name: "Notebook A"
-        Notebook Closed: false
         New Flashcards: 0
         Due Flashcards: 0
         Flashcards: 0
