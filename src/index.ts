@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 13:02:40
  * @FilePath     : /src/index.ts
- * @LastEditTime : 2023-07-26 15:03:37
+ * @LastEditTime : 2024-04-28 15:11:39
  * @Description  : 导出树状图
  */
 import {
@@ -116,7 +116,7 @@ export default class ExportTreePlugin extends Plugin {
         let a = document.createElement("a");
         a.href = url;
 
-        let userName = window.siyuan.user.userName;
+        let userName = window.siyuan?.user?.userName;
         userName = userName ? `@${userName}` : '';
         let timestamp = formatDate(new Date()).replace(/[:]/g, '_');
 
