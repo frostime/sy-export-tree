@@ -28,6 +28,8 @@
     "updated": "Updated",
     "wordCount": "Word Count",
 
+    "getTreeStatError": "An error occurred while getting the document ID",
+
     "setting": {
         "limitNumber": {
             "title": "Limit Number of Concurrent Requests",

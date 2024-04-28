@@ -28,6 +28,8 @@
     "updated": "更新时间",
     "wordCount": "字数",
 
+    "getTreeStatError": "在获取文档id的时候发生错误",
+
     "setting": {
         "limitNumber": {
             "title": "并发数量限额",

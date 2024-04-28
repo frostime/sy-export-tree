@@ -3,13 +3,14 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2024-04-28 16:07:23
+ * @LastEditTime : 2024-04-28 16:46:36
  * @Description  : 导出的文档树的相关数据结构
  */
-import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID, listDocTree } from "./api";
+import { showMessage } from "siyuan";
+import { ResGetTreeStat, getTreeStat, lsNotebooks, getBlockByID, listDocTree } from "./api";
 
 import exportDialog from "./dialog";
-import { limitIt } from "./utils";
+import { i18n, limitIt } from "./utils";
 
 const formatTime = (time: string): string => {
     return time.slice(0, 4) + '-' + time.slice(4, 6) + '-' + time.slice(6, 8) + ' ' + time.slice(8, 10) + ':' + time.slice(10, 12) + ':' + time.slice(12, 14);
@@ -27,13 +28,6 @@ const renameKey = (obj: object, keyMap: { [key: string]: string }) => {
     return newObj;
 }
 
-async function readDocPath(path: string) {
-    let paths = await readDir(path);
-    // "20230723152605-n01h94z.sy"
-    let pat = /^\d+-\w+(\.sy)?$/
-    // let pat = /([0-9a-z\-]+)(\.sy)?$/;
-    return paths.filter((item) => pat.test(item.name));
-}
 
 export class TreeItem {
     docId: DocumentId;
@@ -63,7 +57,15 @@ export class TreeItem {
         this.docTitle = block.content;
         this.created = formatTime(block.created);
         this.updated = formatTime(block.updated);
-        this.stat = await getTreeStat(this.docId);
+        try {
+            this.stat = await getTreeStat(this.docId);
+        } catch (e) {
+            console.groupCollapsed(`Error when query doc: ${this.docId}`);
+            console.error(`Id=${this.docId}; Title=${this.docTitle}`);
+            console.error(e);
+            console.groupEnd();
+            showMessage(i18n.getTreeStatError.replace("ID", this.docId));
+        }
         exportDialog.increase();
     }
 
@@ -134,13 +136,14 @@ export class NotebookTree {
         treeNodes.forEach((tree: IDocTreeNode) => {
             dfs(tree, '');
         });
+        this.documentCount = allItems.length;
 
-        console.group(this.notebook.name);
-        console.log("All items");
-        console.log(allItems);
-        console.log("Tree nodes");
-        console.log(treeNodes);
-        console.groupEnd();
+        // console.group(this.notebook.name);
+        // console.log("All items");
+        // console.log(allItems);
+        // console.log("Tree nodes");
+        // console.log(treeNodes);
+        // console.groupEnd();
 
 
         let allPromises = allItems.map((item) => limitIt(() => item.queryItemInfo()));
@@ -155,7 +158,7 @@ export class NotebookTree {
         }
         allItems.forEach((item) => {
             for (let key in this.stat) {
-                this.stat[key] += item.stat[key];
+                this.stat[key] += item.stat?.[key] ?? 0;
             }
         });
     }
