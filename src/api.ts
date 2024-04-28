@@ -1,25 +1,24 @@
 /**
  * Copyright (c) 2023 frostime. All rights reserved.
  * https://github.com/frostime/sy-plugin-template-vite
+ * 
+ * See API Document in [API.md](https://github.com/siyuan-note/siyuan/blob/master/API.md)
+ * API 文档见 [API_zh_CN.md](https://github.com/siyuan-note/siyuan/blob/master/API_zh_CN.md)
  */
 
 import { fetchSyncPost, IWebSocketData } from "siyuan";
 
 
-async function request(url: string, data: any) {
+export async function request(url: string, data: any) {
     let response: IWebSocketData = await fetchSyncPost(url, data);
     let res = response.code === 0 ? response.data : null;
     return res;
 }
 
-
 // **************************************** Noteboook ****************************************
 
-export type ReslsNotebooks = {
-    notebooks: Notebook[];
-}
 
-export async function lsNotebooks(): Promise<ReslsNotebooks> {
+export async function lsNotebooks(): Promise<IReslsNotebooks> {
     let url = '/api/notebook/lsNotebooks';
     return request(url, '');
 }
@@ -54,14 +53,8 @@ export async function removeNotebook(notebook: NotebookId) {
     return request(url, { notebook: notebook });
 }
 
-export type ResGetNotebookConf = {
-    box: string;
-    conf: NotebookConf;
-    name: string;
-}
 
-
-export async function getNotebookConf(notebook: NotebookId): Promise<ResGetNotebookConf> {
+export async function getNotebookConf(notebook: NotebookId): Promise<IResGetNotebookConf> {
     let data = { notebook: notebook };
     let url = '/api/notebook/getNotebookConf';
     return request(url, data);
@@ -75,7 +68,23 @@ export async function setNotebookConf(notebook: NotebookId, conf: NotebookConf):
 }
 
 
-// **************************************** Document ****************************************
+// **************************************** File Tree ****************************************
+export async function listDocTree(notebook: NotebookId, path: string): Promise<IDocTreeNode[]> {
+    let data = {
+        notebook: notebook,
+        path: path
+    }
+    let url = '/api/filetree/listDocTree';
+    let resData = await request(url, data);
+    return resData?.tree;
+}
+
+export async function listDocsByPath(notebook: NotebookId, path: string) {
+    let url = '/api/filetree/listDocsByPath'
+    let payload = { notebook: notebook, path: path };
+    return request(url, payload);
+}
+
 export async function createDocWithMd(notebook: NotebookId, path: string, markdown: string): Promise<DocumentId> {
     let data = {
         notebook: notebook,
@@ -137,13 +146,19 @@ export async function getHPathByID(id: BlockId): Promise<string> {
     return request(url, data);
 }
 
-// **************************************** Asset Files ****************************************
-export type ResUpload = {
-    errFiles: string[];
-    succMap: { [key: string]: string };
+
+export async function getIDsByHPath(notebook: NotebookId, path: string): Promise<BlockId[]> {
+    let data = {
+        notebook: notebook,
+        path: path
+    };
+    let url = '/api/filetree/getIDsByHPath';
+    return request(url, data);
 }
 
-export async function upload(assetsDirPath: string, files: any[]): Promise<ResUpload> {
+// **************************************** Asset Files ****************************************
+
+export async function upload(assetsDirPath: string, files: any[]): Promise<IResUpload> {
     let form = new FormData();
     form.append('assetsDirPath', assetsDirPath);
     for (let file of files) {
@@ -154,45 +169,57 @@ export async function upload(assetsDirPath: string, files: any[]): Promise<ResUp
 }
 
 // **************************************** Block ****************************************
-export type ResdoOperations = {
-    doOperations: doOperation[];
-    undoOperations: doOperation[] | null;
-}
 type DataType = "markdown" | "dom";
-export async function insertBlock(dataType: DataType, data: string, previousID: BlockId): Promise<ResdoOperations> {
-    let data1 = {
+export async function insertBlock(
+    dataType: DataType, data: string,
+    nextID?: BlockId, previousID?: BlockId, parentID?: BlockId
+): Promise<IResdoOperations[]> {
+    let payload = {
         dataType: dataType,
         data: data,
-        previousID: previousID
+        nextID: nextID,
+        previousID: previousID,
+        parentID: parentID
     }
     let url = '/api/block/insertBlock';
-    return request(url, data1);
+    return request(url, payload);
 }
 
 
-export async function appendBlock(dataType: DataType, data: string, parentID: BlockId | DocumentId): Promise<ResdoOperations> {
-    let data1 = {
+export async function prependBlock(dataType: DataType, data: string, parentID: BlockId | DocumentId): Promise<IResdoOperations[]> {
+    let payload = {
+        dataType: dataType,
+        data: data,
+        parentID: parentID
+    }
+    let url = '/api/block/prependBlock';
+    return request(url, payload);
+}
+
+
+export async function appendBlock(dataType: DataType, data: string, parentID: BlockId | DocumentId): Promise<IResdoOperations[]> {
+    let payload = {
         dataType: dataType,
         data: data,
         parentID: parentID
     }
     let url = '/api/block/appendBlock';
-    return request(url, data1);
+    return request(url, payload);
 }
 
 
-export async function updateBlock(dataType: DataType, data: string, id: BlockId): Promise<ResdoOperations> {
-    let data1 = {
+export async function updateBlock(dataType: DataType, data: string, id: BlockId): Promise<IResdoOperations[]> {
+    let payload = {
         dataType: dataType,
         data: data,
         id: id
     }
     let url = '/api/block/updateBlock';
-    return request(url, data1);
+    return request(url, payload);
 }
 
 
-export async function deleteBlock(id: BlockId): Promise<ResdoOperations> {
+export async function deleteBlock(id: BlockId): Promise<IResdoOperations[]> {
     let data = {
         id: id
     }
@@ -201,7 +228,7 @@ export async function deleteBlock(id: BlockId): Promise<ResdoOperations> {
 }
 
 
-export async function moveBlock(id: BlockId, previousID: PreviousID | null = null, parentID: ParentID | null = null): Promise<ResdoOperations> {
+export async function moveBlock(id: BlockId, previousID?: PreviousID, parentID?: ParentID): Promise<IResdoOperations[]> {
     let data = {
         id: id,
         previousID: previousID,
@@ -212,12 +239,25 @@ export async function moveBlock(id: BlockId, previousID: PreviousID | null = nul
 }
 
 
-export type ResGetBlockKramdown = {
-    id: BlockId;
-    kramdown: string;
+export async function foldBlock(id: BlockId) {
+    let data = {
+        id: id
+    }
+    let url = '/api/block/foldBlock';
+    return request(url, data);
 }
 
-export async function getBlockKramdown(id: BlockId): Promise<ResGetBlockKramdown> {
+
+export async function unfoldBlock(id: BlockId) {
+    let data = {
+        id: id
+    }
+    let url = '/api/block/unfoldBlock';
+    return request(url, data);
+}
+
+
+export async function getBlockKramdown(id: BlockId): Promise<IResGetBlockKramdown> {
     let data = {
         id: id
     }
@@ -225,12 +265,8 @@ export async function getBlockKramdown(id: BlockId): Promise<ResGetBlockKramdown
     return request(url, data);
 }
 
-export type ChildBlock = {
-    id: BlockId;
-    type: BlockType;
-    subtype?: BlockSubType;
-}
-export async function getChildBlocks(id: BlockId): Promise<ChildBlock[]> {
+
+export async function getChildBlocks(id: BlockId): Promise<IResGetChildBlock[]> {
     let data = {
         id: id
     }
@@ -245,6 +281,35 @@ export async function transferBlockRef(fromID: BlockId, toID: BlockId, refIDs: B
         refIDs: refIDs
     }
     let url = '/api/block/transferBlockRef';
+    return request(url, data);
+}
+
+// /api/block/getBlockDOM
+export async function getBlockDOM(id: BlockId): Promise<IBlockDOM> {
+    let data = {
+        id: id
+    };
+    let url = '/api/block/getBlockDOM';
+    return request(url, data);
+}
+
+
+// /api/block/getBlockBreadcrumb
+export async function getBlockBreadcrumb(id: BlockId) {
+    let payload = { id: id, excludeTypes: [] };
+    let url = '/api/block/getBlockBreadcrumb';
+    return request(url, payload);
+}
+
+export async function getBacklink2(id: BlockId): Promise<IBacklink2> {
+    let data = {
+        id: id,
+        k: "",
+        mSort: "3",
+        mk: "",
+        sort: "3"
+    }
+    let url = '/api/ref/getBacklink2';
     return request(url, data);
 }
 
@@ -300,11 +365,7 @@ export async function getBlockByID(blockId: string): Promise<Block> {
 
 // **************************************** Template ****************************************
 
-export type ResGetTemplates = {
-    content: string;
-    path: string;
-}
-export async function render(id: DocumentId, path: string): Promise<ResGetTemplates> {
+export async function render(id: DocumentId, path: string): Promise<IResGetTemplates> {
     let data = {
         id: id,
         path: path
@@ -355,11 +416,8 @@ export async function removeFile(path: string) {
 }
 
 
-export type ResReadDir = {
-    isDir: boolean;
-    name: string;
-}
-export async function readDir(path: string): Promise<ResReadDir[]> {
+
+export async function readDir(path: string): Promise<IResReadDir[]> {
     let data = {
         path: path
     }
@@ -368,17 +426,26 @@ export async function readDir(path: string): Promise<ResReadDir[]> {
 }
 
 
-export type ResExportMdContent = {
-    hPath: string;
-    content: string;
-}
-export async function exportMdContent(id: DocumentId): Promise<ResExportMdContent> {
+// **************************************** Export ****************************************
+
+export async function exportMdContent(id: DocumentId): Promise<IResExportMdContent> {
     let data = {
         id: id
     }
     let url = '/api/export/exportMdContent';
     return request(url, data);
 }
+
+export async function exportResources(paths: string[], name: string): Promise<IResExportResources> {
+    let data = {
+        paths: paths,
+        name: name
+    }
+    let url = '/api/export/exportResources';
+    return request(url, data);
+}
+
+// **************************************** Convert ****************************************
 
 export type PandocArgs = string;
 export async function pandoc(args: PandocArgs[]) {
@@ -389,13 +456,52 @@ export async function pandoc(args: PandocArgs[]) {
     return request(url, data);
 }
 
+// **************************************** Notification ****************************************
+
+// /api/notification/pushMsg
+// {
+//     "msg": "test",
+//     "timeout": 7000
+//   }
+export async function pushMsg(msg: string, timeout: number = 7000) {
+    let payload = {
+        msg: msg,
+        timeout: timeout
+    };
+    let url = "/api/notification/pushMsg";
+    return request(url, payload);
+}
+
+export async function pushErrMsg(msg: string, timeout: number = 7000) {
+    let payload = {
+        msg: msg,
+        timeout: timeout
+    };
+    let url = "/api/notification/pushErrMsg";
+    return request(url, payload);
+}
+
+// **************************************** Network ****************************************
+export async function forwardProxy(
+    url: string, method: string = 'GET', payload: any = {},
+    headers: any[] = [], timeout: number = 7000, contentType: string = "text/html"
+): Promise<IResForwardProxy> {
+    let data = {
+        url: url,
+        method: method,
+        timeout: timeout,
+        contentType: contentType,
+        headers: headers,
+        payload: payload
+    }
+    let url1 = '/api/network/forwardProxy';
+    return request(url1, data);
+}
+
 
 // **************************************** System ****************************************
-export type ResBootProgress = {
-    progress: number;
-    details: string;
-}
-export async function bootProgress(): Promise<ResBootProgress> {
+
+export async function bootProgress(): Promise<IResBootProgress> {
     return request('/api/system/bootProgress', {});
 }
 
