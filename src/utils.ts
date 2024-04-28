@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 18:50:43
  * @FilePath     : /src/utils.ts
- * @LastEditTime : 2023-07-23 18:52:14
+ * @LastEditTime : 2024-04-28 16:07:04
  * @Description  : 
  */
 import zh_Hans from "./i18n/zh_CN.json";
@@ -17,4 +17,16 @@ export function setI18n(i18n_: any) {
         }
     }
     i18n = i18n_;
+}
+
+import pLimit from 'p-limit';
+import { LimitFunction } from 'p-limit';
+
+let limit: LimitFunction;
+export const updateLimit = (num: number) => {
+    limit = pLimit(num);
+}
+
+export const limitIt = async <T>(fn: () => Promise<T>) => {
+    return limit(fn);
 }

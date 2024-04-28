@@ -26,5 +26,13 @@
     "runeCount": "Character Count",
     "stat": "Document Information",
     "updated": "Updated",
-    "wordCount": "Word Count"
+    "wordCount": "Word Count",
+
+    "setting": {
+        "limitNumber": {
+            "title": "Limit Number of Concurrent Requests",
+            "description": "Limit the number of concurrent requests when exporting the document tree structure, adjust according to the performance of the device; default 16"
+        }
+    }
+
 }

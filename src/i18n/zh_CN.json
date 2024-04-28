@@ -26,5 +26,13 @@
     "runeCount": "字符数",
     "stat": "文档信息",
     "updated": "更新时间",
-    "wordCount": "字数"
+    "wordCount": "字数",
+
+    "setting": {
+        "limitNumber": {
+            "title": "并发数量限额",
+            "description": "导出文档树结构时，同时进行的并发数量限额，根据设备性能情况自行调整; 默认 16"
+        }
+    }
+
 }

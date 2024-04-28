@@ -140,20 +140,27 @@ interface CustomEventDetail<T> {
 
 
 /********** Setting **********/
-type TSettingType = "checkbox" | "input" | "button" | "select" | "slider" | "number";
-
+type TSettingItemType = "checkbox" | "select" | "textinput" | "textarea" | "number" | "slider" | "button" | "hint";
 interface ISettingItem {
-    type: TSettingType;
-    title: string;
-    text: string;
     key: string;
     value: any;
+    type: TSettingItemType;
+    title: string;
+    description?: string;
     placeholder?: string;
-    options?: { [key: string]: string };
     slider?: {
         min: number;
         max: number;
         step: number;
     };
+    options?: { [key: string | number]: string };
+    action?: {
+        callback: () => void;
+    }
+    button?: {
+        label: string;
+        callback: () => void;
+    }
 }
+
 
