@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2024-04-28 16:46:36
+ * @LastEditTime : 2024-04-28 16:50:12
  * @Description  : 导出的文档树的相关数据结构
  */
 import { showMessage } from "siyuan";
@@ -65,6 +65,13 @@ export class TreeItem {
             console.error(e);
             console.groupEnd();
             showMessage(i18n.getTreeStatError.replace("ID", this.docId));
+            this.stat = {
+                imageCount: 0,
+                linkCount: 0,
+                refCount: 0,
+                runeCount: 0,
+                wordCount: 0
+            }
         }
         exportDialog.increase();
     }
@@ -120,6 +127,8 @@ export class NotebookTree {
 
     async build() {
         let allItems: TreeItem[] = [];
+        const rootPath = '';
+
         const dfs = (node: IDocTreeNode, parentPath: string) => {
             let item = new TreeItem(parentPath, node.id);
             allItems.push(item);
@@ -129,12 +138,17 @@ export class NotebookTree {
                     item.childDocs.push(childNode);
                 }
             }
+            // root
+            if (parentPath === rootPath) {
+                this.documents.push(item);
+            }
+
             return item;
         }
 
         let treeNodes: IDocTreeNode[] = await listDocTree(this.notebook.id, '/');
         treeNodes.forEach((tree: IDocTreeNode) => {
-            dfs(tree, '');
+            dfs(tree, rootPath);
         });
         this.documentCount = allItems.length;
 
