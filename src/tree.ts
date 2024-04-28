@@ -3,10 +3,10 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2023-07-26 17:13:33
+ * @LastEditTime : 2024-04-28 15:31:26
  * @Description  : 导出的文档树的相关数据结构
  */
-import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID } from "./api";
+import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID, listDocTree } from "./api";
 
 import exportDialog from "./dialog";
 
@@ -55,43 +55,6 @@ export class TreeItem {
         this.stat = null;
         this.childDocs = [];
         this.path = `${docDir}/${this.docId}`;
-    }
-
-    /**
-     * 递归地构建树结构
-     * @param currentPath 当前文档所在的路径, 路径内容不包括 .sy 后缀名
-     * @returns `Array<TreeItem>` 节点遍历的结果列表
-     */
-    async buildTree() {
-        // this.path = currentPath + '.sy';
-        let currentPath = this.path;
-        let childPath = await readDocPath(`${currentPath}`);
-        let childInfo = {};
-        for (let child of childPath) {
-            let name = child.name.replace(/\.sy$/, '');
-            childInfo[name] = child.isDir || childInfo[name] ? true : false;
-        }
-        let dirItems: TreeItem[] = [];
-        for (let id of Object.keys(childInfo)) {
-            let tree_item = new TreeItem(currentPath, id);
-            this.childDocs.push(tree_item);
-            if (childInfo[id]) {
-                dirItems.push(tree_item);
-            }
-        }
-        this.childDocsCount = this.childDocs.length;
-        exportDialog.increase(this.childDocsCount);
-
-        let allItems: TreeItem[] = [];
-        allItems.push(...this.childDocs); // 遍历所有的子节点
-        let retrieve = await Promise.all(dirItems.map((item) => item.buildTree()));
-        allItems.push(...retrieve.flat()); // 遍历所有的子节点的子节点
-        this.offspringDocsCount = allItems.length;
-        // for (let item of dirItems) {
-        //     let retrieve = await item.buildTree(`${currentPath}/${item.docId}`);
-        //     allItems.push(...retrieve);
-        // }
-        return allItems;
     }
 
     async queryItemInfo() {
@@ -153,34 +116,31 @@ export class NotebookTree {
     }
 
     async build() {
-        let childPath = await readDocPath(`/data/${this.notebook.id}`);
-        let childInfo = {};
-        for (let child of childPath) {
-            let name = child.name.replace(/\.sy$/, '');
-            childInfo[name] = child.isDir || childInfo[name] ? true : false;
-        }
-
-        let dirItems: TreeItem[] = [];
-        //挑选出可以继续遍历的文件夹
-        for (let id of Object.keys(childInfo)) {
-            let tree_item = new TreeItem(`/data/${this.notebook.id}`, id);
-            this.documents.push(tree_item);
-            if (childInfo[id]) {
-                dirItems.push(tree_item);
+        let allItems: TreeItem[] = [];
+        const dfs = (node: IDocTreeNode, parentPath: string) => {
+            let item = new TreeItem(parentPath, node.id);
+            allItems.push(item);
+            if (node.children) {
+                for (let child of node.children) {
+                    let childNode = dfs(child, item.path);
+                    item.childDocs.push(childNode);
+                }
             }
+            return item;
         }
 
-        let allItems: TreeItem[] = [...this.documents];
-        let retrieve = await Promise.all(
-            dirItems.map((item) => item.buildTree())
-        );
-        exportDialog.increase(dirItems.length);
-        allItems.push(...retrieve.flat());
-        this.documentCount = allItems.length;
-        // for (let item of dirItems) {
-        //     let retrieve = await item.buildTree(`/data/${this.notebook.id}/${item.docId}`);
-        //     allItems.push(...retrieve);
-        // }
+        let treeNodes: IDocTreeNode[] = await listDocTree(this.notebook.id, '/');
+        treeNodes.forEach((tree: IDocTreeNode) => {
+            dfs(tree, '');
+        });
+
+        console.group(this.notebook.name);
+        console.log("All items");
+        console.log(allItems);
+        console.log("Tree nodes");
+        console.log(treeNodes);
+        console.groupEnd();
+
 
         await Promise.all(
             allItems.map((item) => item.queryItemInfo())
