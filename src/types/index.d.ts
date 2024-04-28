@@ -1,5 +1,10 @@
-/**
- * Copyright (c) 2023 frostime. All rights reserved.
+/*
+ * Copyright (c) 2023 by Yp Z (frostime). All Rights Reserved.
+ * @Author       : Yp Z
+ * @Date         : 2023-07-28 20:49:27
+ * @FilePath     : /src/types/index.d.ts
+ * @LastEditTime : 2024-04-25 21:57:11
+ * @Description  : 
  */
 
 /**
@@ -80,3 +85,82 @@ interface Window {
         languages: any;
     };
 }
+
+type TRuleType = "ChildDocument" 
+    | "SQL" 
+    | "IdList" 
+    | "DocBacklinks"  //反链面板中看到的，一个文档中所有反链
+    | "DocBackmentions" 
+    | "OffspringDocument" 
+    | "BlockBacklinks";  //一个块对应的所有反链
+
+interface IConfig {
+    scroll: boolean;
+    protyleTitle: boolean;
+    breadcrumb: boolean;
+    readonly: boolean;
+    dynamicLoading: {
+        enabled: boolean;
+        capacity: number;
+        shift: number;
+    };
+}
+interface IRule {
+    title: string;
+    hash: string;
+    type: TRuleType;
+    input: any;
+    config: IConfig;
+}
+
+// interface IRuleFetchData {
+//     ids: BlockId[];
+//     eof: boolean;
+// }
+
+interface IBreadcrumb {
+    id: string,
+    name: string,
+    type: string,
+    subType: string,
+    children: []
+}
+
+interface IBacklink {
+    blockPaths: IBreadcrumb[],
+    dom: string
+    expand: boolean
+}
+
+
+interface CustomEventDetail<T> {
+    input: T;
+    config?: any;
+}
+
+
+/********** Setting **********/
+type TSettingItemType = "checkbox" | "select" | "textinput" | "textarea" | "number" | "slider" | "button" | "hint";
+interface ISettingItem {
+    key: string;
+    value: any;
+    type: TSettingItemType;
+    title: string;
+    description?: string;
+    placeholder?: string;
+    slider?: {
+        min: number;
+        max: number;
+        step: number;
+    };
+    options?: { [key: string | number]: string };
+    action?: {
+        callback: () => void;
+    }
+    button?: {
+        label: string;
+        callback: () => void;
+    }
+}
+
+

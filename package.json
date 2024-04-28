@@ -1,6 +1,6 @@
 {
   "name": "sy-export-tree",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "type": "module",
   "description": "",
   "repository": "",
@@ -28,6 +28,7 @@
     "vite-plugin-zip-pack": "^1.0.5"
   },
   "dependencies": {
-    "json-to-pretty-yaml": "^1.2.2"
+    "json-to-pretty-yaml": "^1.2.2",
+    "p-limit": "^5.0.0"
   }
 }
