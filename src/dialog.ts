@@ -3,7 +3,7 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 16:25:46
  * @FilePath     : /src/dialog.ts
- * @LastEditTime : 2023-07-26 15:05:04
+ * @LastEditTime : 2024-04-28 15:45:12
  * @Description  : 
  */
 import { confirm } from "siyuan";
@@ -42,7 +42,7 @@ class ExportDialog {
 
     reset(docCnt: number = 0) {
         this.docCnt = docCnt;
-        this.max = docCnt * 2; // 首先需要获取所有的文档，然后再获取所有的块
+        this.max = docCnt;
         this.value = 0;
         // this.update();
     }

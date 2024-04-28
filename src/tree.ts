@@ -3,12 +3,17 @@
  * @Author       : frostime
  * @Date         : 2023-07-23 14:38:58
  * @FilePath     : /src/tree.ts
- * @LastEditTime : 2024-04-28 15:31:26
+ * @LastEditTime : 2024-04-28 15:56:53
  * @Description  : 导出的文档树的相关数据结构
  */
 import { ResGetTreeStat, getTreeStat, lsNotebooks, readDir, getBlockByID, listDocTree } from "./api";
 
 import exportDialog from "./dialog";
+
+import pLimit from 'p-limit';
+
+const BATCH_SIZE = 32;
+const limit = pLimit(BATCH_SIZE);
 
 const formatTime = (time: string): string => {
     return time.slice(0, 4) + '-' + time.slice(4, 6) + '-' + time.slice(6, 8) + ' ' + time.slice(8, 10) + ':' + time.slice(10, 12) + ':' + time.slice(12, 14);
@@ -142,9 +147,8 @@ export class NotebookTree {
         console.groupEnd();
 
 
-        await Promise.all(
-            allItems.map((item) => item.queryItemInfo())
-        );
+        let allPromises = allItems.map((item) => limit(() => item.queryItemInfo()));
+        await Promise.all(allPromises);
 
         this.stat = {
             imageCount: 0,
